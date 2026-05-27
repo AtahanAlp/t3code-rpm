@@ -17,6 +17,7 @@ Source0:        t3code.desktop
 Source1:        %{upstream_asset}.sha512
 Source2:        LICENSE.upstream
 
+ExclusiveArch:  x86_64
 BuildRequires:  curl
 BuildRequires:  desktop-file-utils
 Requires:       alsa-lib
