@@ -61,10 +61,14 @@ package source.
 Use:
 
 - Clone URL: this repository URL
-- Build method: `make srpm`
+- Build SRPM with: `make_srpm`
 - Spec file: `t3code.spec`
 - Chroots: Fedora `x86_64` targets first
 - Networking: enabled
+
+For the first release, do not enable Mageia or openSUSE chroots. The spec uses
+Fedora/RHEL dependency names and has only been validated for Fedora-family
+builds.
 
 After the COPR build is published, users can install with:
 
@@ -105,8 +109,8 @@ the package is configured with the repository webhook.
 ## Publishing Flow
 
 1. Push this repository to GitHub.
-2. Create `atahanalp/t3code` on https://copr.fedorainfracloud.org.
-3. Add this repository as an SCM package source using `make srpm`.
+2. Create a `t3code` project on https://copr.fedorainfracloud.org.
+3. Add this repository as an SCM package source using `make_srpm`.
 4. Enable Fedora `x86_64` chroots.
 5. Keep networking enabled so the build can download the official upstream
    AppImage and verify its pinned checksum.
@@ -117,7 +121,7 @@ Users can then run:
 
 ```sh
 sudo dnf install dnf-plugins-core
-sudo dnf copr enable atahanalp/t3code
+sudo dnf copr enable <fedora-username>/t3code
 sudo dnf install t3code
 ```
 
