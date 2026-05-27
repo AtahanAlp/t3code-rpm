@@ -14,7 +14,6 @@ srpm:
 	cp LICENSE.upstream "$$workdir/SOURCES/"; \
 	cp "sources/$${asset}.sha512" "$$workdir/SOURCES/"; \
 	rpmbuild -bs \
-		--target x86_64 \
 		--define "_topdir $$workdir" \
 		--define "_sourcedir $$workdir/SOURCES" \
 		--define "_srcrpmdir $$outdir" \

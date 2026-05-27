@@ -63,7 +63,7 @@ Use:
 - Clone URL: this repository URL
 - Build SRPM with: `make_srpm`
 - Spec file: `t3code.spec`
-- Chroots: Fedora `x86_64` targets first
+- Chroots: Fedora `x86_64` targets only
 - Networking: enabled
 
 For the first release, do not enable Mageia or openSUSE chroots. The spec uses
