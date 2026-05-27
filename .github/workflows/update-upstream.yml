@@ -1,0 +1,64 @@
+name: Check upstream T3 Code release
+
+on:
+  schedule:
+    - cron: "17 7 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    name: Update pinned upstream AppImage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out packaging repo
+        uses: actions/checkout@v4
+
+      - name: Install packaging checks
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl desktop-file-utils make rpm
+
+      - name: Detect latest upstream version
+        id: latest
+        run: |
+          set -eu
+          metadata="$(mktemp)"
+          curl -L --fail --silent --show-error \
+            --output "$metadata" \
+            https://github.com/pingdotgg/t3code/releases/latest/download/latest-linux.yml
+
+          version="$(awk '/^version:/ { print $2; exit }' "$metadata")"
+          current="$(rpmspec -q --qf '%{VERSION}\n' t3code.spec | head -n 1)"
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "current=$current" >> "$GITHUB_OUTPUT"
+
+          if [ "$version" = "$current" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Update spec and checksum
+        if: steps.latest.outputs.changed == 'true'
+        run: |
+          ./scripts/update-version.sh "${{ steps.latest.outputs.version }}"
+          make spec-check
+
+      - name: Open update pull request
+        if: steps.latest.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: bot/update-t3code-${{ steps.latest.outputs.version }}
+          commit-message: "Update T3 Code to ${{ steps.latest.outputs.version }}"
+          title: "Update T3 Code to ${{ steps.latest.outputs.version }}"
+          body: |
+            Updates the packaged upstream AppImage from `${{ steps.latest.outputs.current }}` to `${{ steps.latest.outputs.version }}`.
+
+            This was generated from upstream `latest-linux.yml` and refreshes the pinned SHA-512 checksum.
+          labels: automated-update
