@@ -30,8 +30,8 @@ redistribution expectations before publishing a public COPR.
   official T3 Code AppImage into an installable RPM.
 
 The package is intentionally pinned to a specific upstream release and checksum.
-That means every build of a given package version uses the same AppImage, and a
-changed or corrupted download fails the build.
+That means every build of a given package version downloads the same AppImage,
+and a changed or corrupted download fails before extraction.
 
 ## Build Locally
 
@@ -64,6 +64,7 @@ Use:
 - Build method: `make srpm`
 - Spec file: `t3code.spec`
 - Chroots: Fedora `x86_64` targets first
+- Networking: enabled
 
 After the COPR build is published, users can install with:
 
@@ -107,8 +108,10 @@ the package is configured with the repository webhook.
 2. Create `atahanalp/t3code` on https://copr.fedorainfracloud.org.
 3. Add this repository as an SCM package source using `make srpm`.
 4. Enable Fedora `x86_64` chroots.
-5. Enable the COPR webhook for the GitHub repository.
-6. Trigger the first build.
+5. Keep networking enabled so the build can download the official upstream
+   AppImage and verify its pinned checksum.
+6. Enable the COPR webhook for the GitHub repository.
+7. Trigger the first build.
 
 Users can then run:
 

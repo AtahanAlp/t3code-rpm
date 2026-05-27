@@ -1,6 +1,7 @@
 %global app_id t3code
 %global upstream_name T3-Code
 %global upstream_asset %{upstream_name}-%{version}-x86_64.AppImage
+%global upstream_url https://github.com/pingdotgg/t3code/releases/download/v%{version}/%{upstream_asset}
 %global install_dir /opt/%{app_id}
 %global debug_package %{nil}
 %global __provides_exclude_from ^%{install_dir}/.*$
@@ -12,12 +13,12 @@ Release:        1%{?dist}
 Summary:        AI coding desktop app
 License:        MIT
 URL:            https://github.com/pingdotgg/t3code
-Source0:        https://github.com/pingdotgg/t3code/releases/download/v%{version}/%{upstream_asset}
-Source1:        t3code.desktop
-Source2:        %{upstream_asset}.sha512
-Source3:        LICENSE.upstream
+Source0:        t3code.desktop
+Source1:        %{upstream_asset}.sha512
+Source2:        LICENSE.upstream
 
 ExclusiveArch:  x86_64
+BuildRequires:  curl
 BuildRequires:  desktop-file-utils
 Requires:       alsa-lib
 Requires:       gtk3
@@ -43,11 +44,10 @@ This is an unofficial community package.
 %prep
 %setup -q -c -T
 
-(cd %{_sourcedir} && sha512sum -c %{SOURCE2})
-
-cp -p %{SOURCE0} ./t3code.AppImage
-chmod +x ./t3code.AppImage
-./t3code.AppImage --appimage-extract
+curl -L --fail --show-error --output %{upstream_asset} %{upstream_url}
+sha512sum -c %{SOURCE1}
+chmod +x %{upstream_asset}
+./%{upstream_asset} --appimage-extract
 
 %build
 # Prebuilt upstream desktop application.
@@ -63,7 +63,7 @@ exec /opt/t3code/AppRun "$@"
 EOF
 chmod 0755 %{buildroot}%{_bindir}/t3code
 
-install -Dpm 0644 %{SOURCE1} %{buildroot}%{_datadir}/applications/t3code.desktop
+install -Dpm 0644 %{SOURCE0} %{buildroot}%{_datadir}/applications/t3code.desktop
 desktop-file-validate %{buildroot}%{_datadir}/applications/t3code.desktop
 
 icon_file="$(find %{buildroot}%{install_dir} -type f \
@@ -80,7 +80,7 @@ case "${icon_file}" in
 esac
 install -Dpm 0644 "${icon_file}" "%{buildroot}%{_datadir}/pixmaps/t3code.${icon_ext}"
 
-install -Dpm 0644 %{SOURCE3} %{buildroot}%{_licensedir}/%{name}/LICENSE.upstream
+install -Dpm 0644 %{SOURCE2} %{buildroot}%{_licensedir}/%{name}/LICENSE.upstream
 
 %files
 %license %{_licensedir}/%{name}/LICENSE.upstream
