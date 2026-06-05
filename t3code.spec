@@ -8,7 +8,7 @@
 %global __requires_exclude_from ^%{install_dir}/.*$
 
 Name:           t3code
-Version:        0.0.24
+Version:        0.0.25
 Release:        1%{?dist}
 Summary:        AI coding desktop app
 License:        MIT
